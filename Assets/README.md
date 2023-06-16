@@ -1,22 +1,28 @@
-## Problem
-Default MeshCollider.Create in Unity.Physics is very slow
+### Problem
+Runtime collider creation is slow as it rebuilds physics cache.
 
-```
-CreateMeshColliderBenchmark (2.475s)
----
-Time in Milliseconds
-Min:		43.27 ms
-Median:		43.59 ms
-Max:		50.70 ms
-Avg:		43.87 ms
-StdDev:		1.05 ms
-SampleCount:	50
-Sum:		2193.52 ms
-First samples:	▁▁▁█▃▂▁▁▁▁▁▁▁▁▁▁▁▁▂▃▁▁▂▁▁▁▂▂▂▂▁▁▁▁▁▁▂▁▂▂▂▂▁▁▁▁▁▁▁▁
-Histogram:	█▂▁▁▁▁▁▁▁▁
-```
+### Benchmarks
+1. MeshCollider.Create 3500 verts == 25MS with burst
+1. CompoundCollider.Create == 16MS with burst
+    1. 854 PolygonCollider.CreateQuad == 1MS
 
 
+### Proposed solution
+* Voxels
+   * CompoundCollider with few quads in range.   
+   * Update when
+      * env changes
+      * player moves 50% of collider range 
+* Models
+   * MeshCollider compute once
 
-## Option 1
 
+
+### Questions
+1. How much of MeshCollider.create cost is internal checks?
+1. How much of MeshCollider.create cost is welding?
+
+
+### References
+_"I routinely do 30k+ verts in maybe 15ms or less (in a Burst job)"_   
+_"It usually freezes because of synchronous Burst compilation on mesh collider creation, that part is not due to the performance of the internal checks."_   
